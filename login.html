@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PhotoShare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-camera"></i>
+                <h1>PhotoShare Login</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="register-creator.html"><i class="fas fa-user-plus"></i> Register as Creator</a>
+                <a href="register-consumer.html"><i class="fas fa-user-plus"></i> Register as Consumer</a>
+            </div>
+        </nav>
+
+        <!-- Login Form -->
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <i class="fas fa-sign-in-alt fa-3x"></i>
+                    <h2>Login to PhotoShare</h2>
+                    <p>Access your account</p>
+                </div>
+
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="username" placeholder="Enter your username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">
+                            <i class="fas fa-user-tag"></i> I am a
+                        </label>
+                        <select id="role" required>
+                            <option value="">Select account type</option>
+                            <option value="creator">Creator (Upload photos)</option>
+                            <option value="consumer">Consumer (Browse photos)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+
+                    <div class="auth-links">
+                        <p>
+                            Don't have an account? 
+                            <a href="register-creator.html">Register as Creator</a> or 
+                            <a href="register-consumer.html">Register as Consumer</a>
+                        </p>
+                        <p><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a></p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="auth-info">
+                <h3><i class="fas fa-info-circle"></i> About Roles</h3>
+                <div class="role-info">
+                    <div class="role-desc">
+                        <h4><i class="fas fa-user-edit"></i> Creator</h4>
+                        <p>Upload photos, add metadata, manage your content</p>
+                    </div>
+                    <div class="role-desc">
+                        <h4><i class="fas fa-user-friends"></i> Consumer</h4>
+                        <p>Browse photos, add comments, rate photos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>PhotoShare Login | Azure Cloud Application | COM769 Project</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple login script
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            
+            if (!username || !password || !role) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const loginBtn = document.querySelector('.btn-login');
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            loginBtn.disabled = true;
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Check if role matches
+                    if (data.user.role !== role) {
+                        alert(`Error: You are registered as ${data.user.role}, not ${role}`);
+                        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                        loginBtn.disabled = false;
+                        return;
+                    }
+                    
+                    // Save user data
+                    localStorage.setItem('photoapp_user', JSON.stringify(data.user));
+                    localStorage.setItem('photoapp_role', data.user.role);
+                    
+                    // Redirect based on role
+                    if (role === 'creator') {
+                        window.location.href = 'creator.html';
+                    } else {
+                        window.location.href = 'consumer.html';
+                    }
+                } else {
+                    alert('Login failed: ' + (data.error || 'Invalid credentials'));
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                alert('Network error: ' + error);
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

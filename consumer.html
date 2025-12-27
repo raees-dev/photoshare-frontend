@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumer Gallery - PhotoShare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional CSS for consumer page */
+        .gallery-header {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .search-box button {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat i {
+            font-size: 2em;
+            color: #0078d4;
+        }
+        
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .photo-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .photo-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .photo-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .photo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-info {
+            padding: 20px;
+        }
+        
+        .photo-meta {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            color: #666;
+        }
+        
+        .photo-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-photo img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        
+        .comments-section {
+            margin: 30px 0;
+        }
+        
+        .comment {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .rating-stars {
+            font-size: 24px;
+            color: gold;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        .add-comment textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 40px 0;
+        }
+        
+        .page-btn {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .page-btn.active {
+            background: #0078d4;
+            color: white;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            grid-column: 1 / -1;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0078d4;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-images"></i>
+                <h1>Photo Gallery</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="consumer.html" class="active"><i class="fas fa-eye"></i> Browse</a>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <div>
+                            <span id="consumerName">Consumer</span>
+                            <small id="consumerRole">Consumer</small>
+                        </div>
+                    </div>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Gallery Header -->
+        <div class="gallery-header">
+            <h2><i class="fas fa-th-large"></i> Browse Photos</h2>
+            <p>View and interact with photos uploaded by creators</p>
+            
+            <!-- Search Bar -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search photos...">
+                <button onclick="searchPhotos()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="clearSearch()"><i class="fas fa-times"></i> Clear</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat">
+                <i class="fas fa-images"></i>
+                <div>
+                    <h3 id="totalPhotos">0</h3>
+                    <p>Total Photos</p>
+                </div>
+            </div>
+            <div class="stat">
+                <i class="fas fa-users"></i>
+                <div>
+                    <h3 id="totalCreators">0</h3>
+                    <p>Active Creators</p>
+                </div>
+            </div>
+            <div class="stat">
+                <i class="fas fa-comments"></i>
+                <div>
+                    <h3 id="totalComments">0</h3>
+                    <p>Total Comments</p>
+                </div>
+            </div>
+            <div class="stat">
+                <i class="fas fa-star"></i>
+                <div>
+                    <h3 id="avgRating">0.0</h3>
+                    <p>Average Rating</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo Gallery -->
+        <div id="galleryContainer">
+            <div id="photoGallery" class="photo-gallery">
+                <!-- Photos will load here -->
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <div class="loader"></div>
+                <p>Loading photos...</p>
+            </div>
+            
+            <div id="noResults" style="display: none; text-align: center; padding: 40px;">
+                <i class="fas fa-image fa-3x"></i>
+                <h3>No photos found</h3>
+                <p>Try a different search</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <!-- Will be generated dynamically -->
+        </div>
+
+        <!-- Photo Detail Modal -->
+        <div id="photoModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <div id="modalBody">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Consumer Gallery | PhotoShare Azure Platform | COM769 Assignment</p>
+            <p><strong>Student:</strong> [Your Name] | <strong>ID:</strong> [Your ID]</p>
+        </footer>
+    </div>
+
+    <script>
+        // ==================== MAIN VARIABLES ====================
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentUser = null;
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            currentUser = JSON.parse(localStorage.getItem('photoapp_user'));
+            
+            if (!currentUser) {
+                alert('Please login first!');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (currentUser.role !== 'consumer') {
+                alert('This page is for consumers only!');
+                window.location.href = 'creator.html';
+                return;
+            }
+            
+            // Update UI
+            document.getElementById('consumerName').textContent = currentUser.username;
+            
+            // Load photos
+            loadPhotos();
+            
+            // Setup search
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchPhotos();
+            });
+        });
+
+        // ==================== PHOTO LOADING ====================
+        async function loadPhotos() {
+            showLoading(true);
+            hideNoResults();
+            
+            try {
+                const searchQuery = document.getElementById('searchInput').value;
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: 12,
+                    search: searchQuery
+                });
+                
+                const response = await fetch(`http://127.0.0.1:5000/api/photos?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayPhotos(data.photos);
+                    updatePagination(data.pagination);
+                    updateStats(data.pagination?.total || 0);
+                } else {
+                    showNoResults();
+                }
+            } catch (error) {
+                console.error('Error loading photos:', error);
+                showNoResults();
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function displayPhotos(photos) {
+            const container = document.getElementById('photoGallery');
+            
+            if (!photos || photos.length === 0) {
+                showNoResults();
+                return;
+            }
+            
+            let html = '';
+            
+            photos.forEach(photo => {
+                // Create fallback image using SVG (no internet needed)
+                const fallbackSVG = `data:image/svg+xml;base64,${btoa(`
+                    <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="300" height="200" fill="#f0f0f0"/>
+                        <text x="150" y="100" font-family="Arial" font-size="14" fill="#666" text-anchor="middle">${photo.title}</text>
+                        <text x="150" y="120" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Photo</text>
+                    </svg>
+                `)}`;
+                
+                html += `
+                    <div class="photo-card" onclick="viewPhoto(${photo.id})">
+                        <div class="photo-image">
+                            <img src="${photo.image_url}" 
+                                 alt="${photo.title}"
+                                 onerror="this.src='${fallbackSVG}'">
+                        </div>
+                        <div class="photo-info">
+                            <h3>${photo.title}</h3>
+                            <p>${photo.description || 'No description'}</p>
+                            <div class="photo-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> ${photo.location || 'Unknown'}</span>
+                                <span><i class="fas fa-star"></i> ${photo.avg_rating || '0.0'}</span>
+                            </div>
+                            <div class="photo-footer">
+                                <span><i class="fas fa-user"></i> ${photo.uploader_name || 'Anonymous'}</span>
+                                <span>${formatDate(photo.created_at)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ==================== PHOTO DETAILS ====================
+        async function viewPhoto(photoId) {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/photos/${photoId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showPhotoModal(data);
+                } else {
+                    alert('Failed to load photo details');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function showPhotoModal(photoData) {
+            const photo = photoData.photo;
+            const comments = photoData.comments || [];
+            const stats = photoData.stats || {};
+            
+            const fallbackSVG = `data:image/svg+xml;base64,${btoa(`
+                <svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="600" height="400" fill="#f0f0f0"/>
+                    <text x="300" y="200" font-family="Arial" font-size="20" fill="#666" text-anchor="middle">${photo.title}</text>
+                    <text x="300" y="230" font-family="Arial" font-size="16" fill="#999" text-anchor="middle">Click to view details</text>
+                </svg>
+            `)}`;
+            
+            let modalHTML = `
+                <div class="modal-photo">
+                    <img src="${photo.image_url}" 
+                         alt="${photo.title}"
+                         onerror="this.src='${fallbackSVG}'">
+                </div>
+                <h2>${photo.title}</h2>
+                <p><strong>Description:</strong> ${photo.description || 'No description'}</p>
+                <p><strong>Location:</strong> ${photo.location || 'Unknown'}</p>
+                <p><strong>Uploaded by:</strong> ${photo.uploader_name || 'Anonymous'}</p>
+                <p><strong>Uploaded on:</strong> ${formatDate(photo.created_at)}</p>
+                
+                <div class="stats" style="margin: 20px 0; display: flex; gap: 20px;">
+                    <div><i class="fas fa-eye"></i> ${stats.views || 0} views</div>
+                    <div><i class="fas fa-star"></i> ${stats.avg_rating?.toFixed(1) || '0.0'} rating</div>
+                    <div><i class="fas fa-comment"></i> ${stats.rating_count || 0} ratings</div>
+                </div>
+            `;
+            
+            // Rating Section
+            modalHTML += `
+                <div style="margin: 30px 0;">
+                    <h3><i class="fas fa-star"></i> Rate this photo</h3>
+                    <div class="rating-stars">
+                        ${[1,2,3,4,5].map(star => `
+                            <i class="far fa-star" 
+                               onclick="ratePhoto(${photo.id}, ${star})"
+                               style="margin: 0 5px; cursor: pointer;"></i>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Comments Section
+            modalHTML += `
+                <div class="comments-section">
+                    <h3><i class="fas fa-comments"></i> Comments (${comments.length})</h3>
+                    
+                    <div id="commentsList" style="margin: 20px 0;">
+                        ${comments.length > 0 ? comments.map(comment => `
+                            <div class="comment">
+                                <strong>${comment.username || 'Anonymous'}:</strong>
+                                <p>${comment.comment_text}</p>
+                                <small>${formatDate(comment.created_at)}</small>
+                            </div>
+                        `).join('') : '<p>No comments yet. Be the first to comment!</p>'}
+                    </div>
+                    
+                    <div class="add-comment">
+                        <textarea id="newComment" placeholder="Write a comment..." rows="3"></textarea>
+                        <button onclick="addComment(${photo.id})" style="background: #0078d4; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-paper-plane"></i> Post Comment
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalBody').innerHTML = modalHTML;
+            document.getElementById('photoModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+
+        // ==================== INTERACTIONS ====================
+        async function ratePhoto(photoId, rating) {
+            if (!currentUser) {
+                alert('Please login to rate photos');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/photos/${photoId}/rate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        rating: rating
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Rating submitted!');
+                    viewPhoto(photoId); // Refresh modal
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error');
+            }
+        }
+        
+        async function addComment(photoId) {
+            const commentText = document.getElementById('newComment').value.trim();
+            
+            if (!commentText) {
+                alert('Please enter a comment');
+                return;
+            }
+            
+            if (!currentUser) {
+                alert('Please login to comment');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/photos/${photoId}/comments`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        comment: commentText
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('newComment').value = '';
+                    alert('Comment posted!');
+                    viewPhoto(photoId); // Refresh modal
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error');
+            }
+        }
+
+        // ==================== SEARCH & PAGINATION ====================
+        function searchPhotos() {
+            currentPage = 1;
+            loadPhotos();
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentPage = 1;
+            loadPhotos();
+        }
+        
+        function updatePagination(pagination) {
+            const container = document.getElementById('pagination');
+            
+            if (!pagination || pagination.pages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            totalPages = pagination.pages;
+            container.style.display = 'flex';
+            
+            let html = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="goToPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i> Prev</button>`;
+            }
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<button class="page-btn active">${i}</button>`;
+                } else {
+                    html += `<button class="page-btn" onclick="goToPage(${i})">${i}</button>`;
+                }
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="goToPage(${currentPage + 1})">Next <i class="fas fa-chevron-right"></i></button>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function goToPage(page) {
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                loadPhotos();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        function showNoResults() {
+            document.getElementById('noResults').style.display = 'block';
+            document.getElementById('photoGallery').innerHTML = '';
+        }
+        
+        function hideNoResults() {
+            document.getElementById('noResults').style.display = 'none';
+        }
+        
+        function updateStats(totalPhotos) {
+            document.getElementById('totalPhotos').textContent = totalPhotos;
+            // You can add more stats updates here
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        function logout() {
+            localStorage.removeItem('photoapp_user');
+            window.location.href = 'index.html';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('photoModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

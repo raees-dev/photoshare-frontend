@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register as Creator - PhotoShare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-user-edit"></i>
+                <h1>Register as Creator</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="register-consumer.html"><i class="fas fa-user-friends"></i> Register as Consumer</a>
+            </div>
+        </nav>
+
+        <div class="register-container">
+            <div class="register-form">
+                <div class="form-header">
+                    <h2><i class="fas fa-user-edit"></i> Creator Account Registration</h2>
+                    <p>Create an account to upload and manage photos</p>
+                </div>
+
+                <form id="creatorRegisterForm">
+                    <div class="form-group">
+                        <label for="c_username">
+                            <i class="fas fa-user"></i> Username *
+                        </label>
+                        <input type="text" id="c_username" placeholder="Choose a username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="c_email">
+                            <i class="fas fa-envelope"></i> Email Address *
+                        </label>
+                        <input type="email" id="c_email" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="c_password">
+                            <i class="fas fa-lock"></i> Password *
+                        </label>
+                        <input type="password" id="c_password" placeholder="Minimum 6 characters" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="c_confirm_password">
+                            <i class="fas fa-lock"></i> Confirm Password *
+                        </label>
+                        <input type="password" id="c_confirm_password" placeholder="Re-enter password" required>
+                    </div>
+
+                    <input type="hidden" id="c_role" value="creator">
+
+                    <div class="form-terms">
+                        <input type="checkbox" id="c_terms" required>
+                        <label for="c_terms">
+                            I agree to the Terms of Service and Privacy Policy
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-creator-register">
+                        <i class="fas fa-user-plus"></i> Create Creator Account
+                    </button>
+
+                    <div class="form-footer">
+                        <p>Already have an account? <a href="login.html">Login here</a></p>
+                        <p>Want to browse photos? <a href="register-consumer.html">Register as Consumer</a></p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="register-info">
+                <h3><i class="fas fa-crown"></i> Creator Benefits</h3>
+                <div class="benefits-list">
+                    <div class="benefit">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <div>
+                            <h4>Upload Photos</h4>
+                            <p>Upload unlimited high-quality photos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit">
+                        <i class="fas fa-edit"></i>
+                        <div>
+                            <h4>Manage Metadata</h4>
+                            <p>Add titles, descriptions, locations, tags</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit">
+                        <i class="fas fa-chart-bar"></i>
+                        <div>
+                            <h4>View Analytics</h4>
+                            <p>Track views, ratings, and comments</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <h4>Privacy Control</h4>
+                            <p>Set photos as public or private</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="azure-info">
+                    <h4><i class="fab fa-microsoft"></i> Powered by Azure</h4>
+                    <p>Your photos are securely stored in Azure Blob Storage with global CDN delivery.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Creator Registration | PhotoShare Azure Platform | Academic Project</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('creatorRegisterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('c_username').value;
+            const email = document.getElementById('c_email').value;
+            const password = document.getElementById('c_password').value;
+            const confirmPassword = document.getElementById('c_confirm_password').value;
+            const role = document.getElementById('c_role').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+            
+            if (!document.getElementById('c_terms').checked) {
+                alert('Please accept the terms and conditions');
+                return;
+            }
+            
+            const btn = document.querySelector('.btn-creator-register');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        role: role
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Creator account created successfully! Please login.');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Registration failed: ' + (data.error || 'Unknown error'));
+                    btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Creator Account';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert('Network error: ' + error);
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Creator Account';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoShare - Cloud Native Photo Sharing Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="logo">
+                <i class="fas fa-camera"></i>
+                <h1>PhotoShare</h1>
+                <span class="tag">Azure Cloud</span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
+                <a href="consumer.html" class="consumer-only"><i class="fas fa-eye"></i> Browse</a>
+                <a href="creator.html" class="creator-only"><i class="fas fa-upload"></i> Upload</a>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-login" onclick="showAuthModal('login')">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button class="btn-register" onclick="showAuthModal('register')">
+                        <i class="fas fa-user-plus"></i> Register
+                    </button>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <div>
+                            <span id="userName">User</span>
+                            <small id="userRole">Role</small>
+                        </div>
+                    </div>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Scalable Photo Sharing Platform</h2>
+                <p class="subtitle">Built on Microsoft Azure with Cloud-Native Architecture</p>
+                <p class="description">
+                    A modern, scalable web application for photo sharing with separate interfaces 
+                    for creators and consumers. Deployed on Azure App Service with SQL Database 
+                    and Blob Storage.
+                </p>
+                
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="scrollToFeatures()">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </button>
+                    <button class="btn-secondary" onclick="showAuthModal('login')">
+                        <i class="fas fa-rocket"></i> Get Started
+                    </button>
+                </div>
+                
+                <div class="tech-stack">
+                    <span class="tech-tag"><i class="fab fa-microsoft"></i> Azure App Service</span>
+                    <span class="tech-tag"><i class="fas fa-database"></i> SQL Database</span>
+                    <span class="tech-tag"><i class="fas fa-archive"></i> Blob Storage</span>
+                    <span class="tech-tag"><i class="fas fa-code"></i> Flask API</span>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <div class="arch-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-node">
+                            <i class="fas fa-users"></i>
+                            <h4>Users</h4>
+                            <p>Creators & Consumers</p>
+                        </div>
+                        <div class="arch-arrow">→</div>
+                        <div class="arch-node">
+                            <i class="fas fa-globe"></i>
+                            <h4>Frontend</h4>
+                            <p>HTML/CSS/JS</p>
+                        </div>
+                        <div class="arch-arrow">→</div>
+                        <div class="arch-node">
+                            <i class="fas fa-server"></i>
+                            <h4>Backend</h4>
+                            <p>Python Flask</p>
+                        </div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-node">
+                            <i class="fas fa-database"></i>
+                            <h4>Database</h4>
+                            <p>Azure SQL</p>
+                        </div>
+                        <div class="arch-arrow">↗</div>
+                        <div class="arch-node">
+                            <i class="fas fa-cloud"></i>
+                            <h4>Storage</h4>
+                            <p>Blob Storage</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Authentication Modal -->
+        <div class="modal" id="authModal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeAuthModal()">&times;</button>
+                <div class="modal-body" id="authModalBody">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2 class="section-title">
+                <i class="fas fa-cogs"></i> Project Features
+            </h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Scalable Architecture</h3>
+                    <p>Built on Azure cloud services for horizontal scaling. Uses App Service, SQL Database, and Blob Storage with CDN.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Auto-scaling capability</li>
+                        <li><i class="fas fa-check"></i> Load balancing</li>
+                        <li><i class="fas fa-check"></i> Global CDN delivery</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Role-Based Access</h3>
+                    <p>Separate interfaces for Creators (upload) and Consumers (browse) with proper authentication and authorization.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Creator accounts</li>
+                        <li><i class="fas fa-check"></i> Consumer accounts</li>
+                        <li><i class="fas fa-check"></i> Secure authentication</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Photo Management</h3>
+                    <p>Upload, organize, and share photos with metadata including title, description, location, and tags.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Photo upload</li>
+                        <li><i class="fas fa-check"></i> Metadata management</li>
+                        <li><i class="fas fa-check"></i> Search and filter</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Social Features</h3>
+                    <p>Engage with photos through comments and ratings. Built-in social interaction system.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Comment system</li>
+                        <li><i class="fas fa-check"></i> 5-star ratings</li>
+                        <li><i class="fas fa-check"></i> User interactions</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Azure Services Section -->
+        <section class="azure-services">
+            <h2 class="section-title">
+                <i class="fab fa-microsoft"></i> Azure Services Used
+            </h2>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon azure">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3>App Service</h3>
+                    <p>Hosts the Flask backend API with auto-scaling and load balancing.</p>
+                    <div class="service-specs">
+                        <span>Python Runtime</span>
+                        <span>Auto-scaling</span>
+                        <span>SSL Enabled</span>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon azure">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>SQL Database</h3>
+                    <p>Stores user data, photo metadata, comments, and ratings securely.</p>
+                    <div class="service-specs">
+                        <span>Basic Tier</span>
+                        <span>2GB Storage</span>
+                        <span>Backup Enabled</span>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon azure">
+                        <i class="fas fa-archive"></i>
+                    </div>
+                    <h3>Blob Storage</h3>
+                    <p>Stores uploaded photos with redundancy and CDN integration.</p>
+                    <div class="service-specs">
+                        <span>LRS Redundancy</span>
+                        <span>Hot Access Tier</span>
+                        <span>CDN Enabled</span>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon azure">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>Networking</h3>
+                    <p>Secure communication between services with proper firewall rules.</p>
+                    <div class="service-specs">
+                        <span>VNet Integration</span>
+                        <span>Firewall Rules</span>
+                        <span>Private Endpoints</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Role Selection Section -->
+        <section class="role-selection">
+            <h2 class="section-title">
+                <i class="fas fa-user-tag"></i> Choose Your Role
+            </h2>
+            
+            <div class="role-cards">
+                <div class="role-card creator-card">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <h3>Creator Account</h3>
+                        <p class="role-price">Upload & Manage Photos</p>
+                    </div>
+                    
+                    <div class="role-features">
+                        <h4>Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-cloud-upload-alt"></i> Upload unlimited photos</li>
+                            <li><i class="fas fa-edit"></i> Add titles, descriptions, tags</li>
+                            <li><i class="fas fa-map-marker-alt"></i> Add location metadata</li>
+                            <li><i class="fas fa-chart-bar"></i> View photo analytics</li>
+                            <li><i class="fas fa-lock"></i> Private/public visibility control</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="role-action">
+                        <button class="btn-creator" onclick="showAuthModal('register', 'creator')">
+                            <i class="fas fa-user-plus"></i> Register as Creator
+                        </button>
+                        <p class="role-note">For photographers and content creators</p>
+                    </div>
+                </div>
+                
+                <div class="role-card consumer-card">
+                    <div class="role-header">
+                        <div class="role-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h3>Consumer Account</h3>
+                        <p class="role-price">Browse & Interact</p>
+                    </div>
+                    
+                    <div class="role-features">
+                        <h4>Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-images"></i> Browse photo gallery</li>
+                            <li><i class="fas fa-search"></i> Search and filter photos</li>
+                            <li><i class="fas fa-comment"></i> Add comments</li>
+                            <li><i class="fas fa-star"></i> Rate photos (1-5 stars)</li>
+                            <li><i class="fas fa-heart"></i> Save favorites</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="role-action">
+                        <button class="btn-consumer" onclick="showAuthModal('register', 'consumer')">
+                            <i class="fas fa-user-plus"></i> Register as Consumer
+                        </button>
+                        <p class="role-note">For users who want to browse photos</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Info Section -->
+        <section class="project-info">
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Academic Project</h3>
+                    <p><strong>Course:</strong> COM769 - Modern Development & Deployment</p>
+                    <p><strong>University:</strong> Ulster University</p>
+                    <p><strong>Assessment:</strong> Scalable Advanced Software Solution</p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Learning Outcomes</h3>
+                    <ul>
+                        <li>✓ Cloud-native application development</li>
+                        <li>✓ Scalable architecture design</li>
+                        <li>✓ Azure services integration</li>
+                        <li>✓ REST API development</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start Guide -->
+        <section class="quick-start">
+            <h2 class="section-title">
+                <i class="fas fa-play-circle"></i> Quick Start Guide
+            </h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Register Account</h3>
+                    <p>Choose between Creator or Consumer role based on your needs.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Login</h3>
+                    <p>Access your personalized dashboard based on your role.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Use Platform</h3>
+                    <p>Upload photos (Creators) or browse gallery (Consumers).</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Interact</h3>
+                    <p>Add comments, rate photos, and explore features.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-camera"></i>
+                        <h3>PhotoShare</h3>
+                    </div>
+                    <p>Scalable Cloud-Native Photo Sharing Platform</p>
+                    <p class="footer-subtitle">Built on Microsoft Azure</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Project Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="consumer.html"><i class="fas fa-external-link-alt"></i> Browse Gallery</a></li>
+                        <li><a href="#" onclick="showAuthModal('login')"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                        <li><a href="#" onclick="showAuthModal('register')"><i class="fas fa-user-plus"></i> Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Azure Services</h4>
+                    <div class="azure-tags">
+                        <span class="azure-tag">App Service</span>
+                        <span class="azure-tag">SQL Database</span>
+                        <span class="azure-tag">Blob Storage</span>
+                        <span class="azure-tag">CDN</span>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Student Info</h4>
+                    <div class="student-info">
+                        <p><strong>Name:</strong> [Your Name]</p>
+                        <p><strong>Student ID:</strong> [Your ID]</p>
+                        <p><strong>Course:</strong> COM769</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2024 PhotoShare | Cloud-Native Web Application | Academic Project for Ulster University</p>
+                <div class="footer-badges">
+                    <span class="badge azure-badge">
+                        <i class="fab fa-microsoft"></i> Microsoft Azure
+                    </span>
+                    <span class="badge">
+                        <i class="fas fa-code"></i> Flask REST API
+                    </span>
+                    <span class="badge">
+                        <i class="fas fa-mobile-alt"></i> Responsive Design
+                    </span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Add this CSS in style.css or here in style tag -->
+    <style>
+        /* Additional styles for auth modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .auth-form {
+            padding: 20px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-btn.active {
+            color: #0078d4;
+            border-bottom-color: #0078d4;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info i {
+            font-size: 24px;
+            color: #0078d4;
+        }
+        
+        /* Hide elements based on auth state */
+        .consumer-only,
+        .creator-only {
+            display: none;
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .notification.info {
+            border-left: 4px solid #0078d4;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthState();
+            setupAuthModal();
+        });
+        
+        function checkAuthState() {
+            const user = PhotoShare.Auth.getCurrentUser();
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userName = document.getElementById('userName');
+            const userRole = document.getElementById('userRole');
+            
+            if (user) {
+                // User is logged in
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userName.textContent = user.username;
+                userRole.textContent = user.role;
+                
+                // Show/hide role-based links
+                const creatorLinks = document.querySelectorAll('.creator-only');
+                const consumerLinks = document.querySelectorAll('.consumer-only');
+                
+                if (user.role === 'creator') {
+                    creatorLinks.forEach(link => link.style.display = 'block');
+                } else if (user.role === 'consumer') {
+                    consumerLinks.forEach(link => link.style.display = 'block');
+                }
+            } else {
+                // User is not logged in
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+        
+        function showAuthModal(type, role = null) {
+            const modal = document.getElementById('authModal');
+            const modalBody = document.getElementById('authModalBody');
+            
+            if (type === 'login') {
+                modalBody.innerHTML = `
+                    <h2><i class="fas fa-sign-in-alt"></i> Login to PhotoShare</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="modalUsername">Username</label>
+                            <input type="text" id="modalUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalPassword">Password</label>
+                            <input type="password" id="modalPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalRole">Login as</label>
+                            <select id="modalRole">
+                                <option value="consumer">Consumer</option>
+                                <option value="creator">Creator</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+                    <p style="text-align: center; margin-top: 15px;">
+                        Don't have an account? 
+                        <a href="#" onclick="showAuthModal('register')">Register here</a>
+                    </p>
+                `;
+                
+                // Add event listener for login form
+                setTimeout(() => {
+                    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const username = document.getElementById('modalUsername').value;
+                        const password = document.getElementById('modalPassword').value;
+                        const role = document.getElementById('modalRole').value;
+                        
+                        const result = await PhotoShare.Auth.login(username, password);
+                        
+                        if (result.success) {
+                            closeAuthModal();
+                            PhotoShare.Utils.showNotification('Login successful!', 'success');
+                            checkAuthState();
+                            
+                            // Redirect based on role
+                            setTimeout(() => {
+                                if (role === 'creator') {
+                                    window.location.href = 'creator.html';
+                                } else {
+                                    window.location.href = 'consumer.html';
+                                }
+                            }, 1000);
+                        } else {
+                            PhotoShare.Utils.showNotification(result.error, 'error');
+                        }
+                    });
+                }, 100);
+                
+            } else if (type === 'register') {
+                modalBody.innerHTML = `
+                    <h2><i class="fas fa-user-plus"></i> Register New Account</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="regUsername">Username *</label>
+                            <input type="text" id="regUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Email *</label>
+                            <input type="email" id="regEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Password *</label>
+                            <input type="password" id="regPassword" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="regRoleSelect">Account Type *</label>
+                            <select id="regRoleSelect" required>
+                                <option value="">Choose role</option>
+                                <option value="consumer" ${role === 'consumer' ? 'selected' : ''}>Consumer (Browse photos)</option>
+                                <option value="creator" ${role === 'creator' ? 'selected' : ''}>Creator (Upload photos)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">
+                            <i class="fas fa-user-plus"></i> Register
+                        </button>
+                    </form>
+                    <p style="text-align: center; margin-top: 15px;">
+                        Already have an account? 
+                        <a href="#" onclick="showAuthModal('login')">Login here</a>
+                    </p>
+                `;
+                
+                // Add event listener for register form
+                setTimeout(() => {
+                    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const username = document.getElementById('regUsername').value;
+                        const email = document.getElementById('regEmail').value;
+                        const password = document.getElementById('regPassword').value;
+                        const role = document.getElementById('regRoleSelect').value;
+                        
+                        if (!PhotoShare.Utils.validateEmail(email)) {
+                            PhotoShare.Utils.showNotification('Please enter a valid email', 'error');
+                            return;
+                        }
+                        
+                        if (password.length < 6) {
+                            PhotoShare.Utils.showNotification('Password must be at least 6 characters', 'error');
+                            return;
+                        }
+                        
+                        const result = await PhotoShare.Auth.register({
+                            username: username,
+                            email: email,
+                            password: password,
+                            role: role
+                        });
+                        
+                        if (result.success) {
+                            closeAuthModal();
+                            PhotoShare.Utils.showNotification('Registration successful! Please login.', 'success');
+                            showAuthModal('login');
+                        } else {
+                            PhotoShare.Utils.showNotification(result.error || 'Registration failed', 'error');
+                        }
+                    });
+                }, 100);
+            }
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+        
+        function setupAuthModal() {
+            // Close modal when clicking outside
+            document.getElementById('authModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAuthModal();
+                }
+            });
+        }
+        
+        function logout() {
+            PhotoShare.Auth.logout();
+            PhotoShare.Utils.showNotification('Logged out successfully', 'success');
+            checkAuthState();
+        }
+        
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Show notification function
+        window.showNotification = function(message, type = 'info') {
+            PhotoShare.Utils.showNotification(message, type);
+        };
+    </script>
+</body>
+</html>
